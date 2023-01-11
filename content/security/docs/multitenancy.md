@@ -134,10 +134,10 @@ spec:
       requiredDuringSchedulingIgnoredDuringExecution:
         nodeSelectorTerms:
         - matchExpressions:
-            - key: tenant
-              operator: In
-              values:
-          - tenants-x
+          - key: tenant
+            operator: In
+            values:
+            - tenants-x
 ...
 ```
 

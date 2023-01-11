@@ -458,14 +458,15 @@ spec:
 Configuring your images with a read-only root file system prevents an attacker from overwriting a binary on the file system that your application uses. If your application has to write to the file system, consider writing to a temporary directory or attach and mount a volume. You can enforce this by setting the pod's SecurityContext as follows:
 
 ```yaml
----
+...
 securityContext:
   readOnlyRootFilesystem: true
-```
+...
+``` 
 
 Policy-as-code and Pod Security Standards can be used to enforce this behavior.
 
-!!! Info
+!!! Info 
 
     As per [Windows containers in Kubernetes](https://kubernetes.io/docs/concepts/windows/intro/) `securityContext.readOnlyRootFilesystem` cannot be set to
     `true` for a container running on Windows as write access is required for registry and system processes to run inside the container.

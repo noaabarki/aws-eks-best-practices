@@ -1,8 +1,7 @@
 # Tenant Isolation
-
 When we think of multi-tenancy, we often want to isolate a user or application from other users or applications running on a shared infrastructure.
 
-Kubernetes is a _single tenant orchestrator_, i.e. a single instance of the control plane is shared among all the tenants within a cluster. There are, however, various Kubernetes objects that you can use to create the semblance of multi-tenancy. For example, Namespaces and Role-based access controls (RBAC) can be implemented to logically isolate tenants from each other. Similarly, Quotas and Limit Ranges can be used to control the amount of cluster resources each tenant can consume. Nevertheless, the cluster is the only construct that provides a strong security boundary. This is because an attacker that manages to gain access to a host within the cluster can retrieve _all_ Secrets, ConfigMaps, and Volumes, mounted on that host. They could also impersonate the Kubelet which would allow them to manipulate the attributes of the node and/or move laterally within the cluster.
+Kubernetes is a _single tenant orchestrator_, i.e. a single instance of the control plane is shared among all the tenants  within a cluster. There are, however, various Kubernetes objects that you can use to create the semblance of multi-tenancy. For example, Namespaces and Role-based access controls (RBAC) can be implemented to logically isolate tenants from each other. Similarly, Quotas and Limit Ranges can be used to control the amount of cluster resources each tenant can consume. Nevertheless, the cluster is the only construct that provides a strong security boundary. This is because an attacker that manages to gain access to a host within the cluster can retrieve _all_ Secrets, ConfigMaps, and Volumes, mounted on that host. They could also impersonate the Kubelet which would allow them to manipulate the attributes of the node and/or move laterally within the cluster.
 
 The following sections will explain how to implement tenant isolation while mitigating the risks of using a single tenant orchestrator like Kubernetes.
 
@@ -16,20 +15,20 @@ None of these controls, however, prevent pods from different tenants from sharin
 Soft multi-tenancy implemented with Namespaces does not allow you to provide tenants with a filtered list of Namespaces because Namespaces are a globally scoped Type. If a tenant has the ability to view a particular Namespace, it can view all Namespaces within the cluster.
 
 !!! warning
-With soft-multi-tenancy, tenants retain the ability to query CoreDNS for all services that run within the cluster by default. An attacker could exploit this by running dig SRV _._.svc.cluster.local from any pod in the cluster. If you need to restrict access to DNS records of services that run within your clusters, consider using the Firewall or Policy plugins for CoreDNS. For additional information, see [https://github.com/coredns/policy#kubernetes-metadata-multi-tenancy-policy](https://github.com/coredns/policy#kubernetes-metadata-multi-tenancy-policy).
+With soft-multi-tenancy, tenants retain the ability to query CoreDNS for all services that run within the cluster by default. An attacker could exploit this by running dig SRV *.*.svc.cluster.local from any pod in the cluster.  If you need to restrict access to DNS records of services that run within your clusters, consider using the Firewall or Policy plugins for CoreDNS. For additional information, see [https://github.com/coredns/policy#kubernetes-metadata-multi-tenancy-policy](https://github.com/coredns/policy#kubernetes-metadata-multi-tenancy-policy).
 
-[Kiosk](https://github.com/kiosk-sh/kiosk) is an open source project that can aid in the implementation of soft multi-tenancy. It is implemented as a series of CRDs and controllers that provide the following capabilities:
+[Kiosk](https://github.com/kiosk-sh/kiosk) is an open source project that can aid in the implementation of soft multi-tenancy.  It is implemented as a series of CRDs and controllers that provide the following capabilities: 
 
-- **Accounts & Account Users** to separate tenants in a shared Kubernetes cluster
-- **Self-Service Namespace Provisioning** for account users
-- **Account Limits** to ensure quality of service and fairness when sharing a cluster
-- **Namespace Templates** for secure tenant isolation and self-service namespace initialization
+  + **Accounts & Account Users** to separate tenants in a shared Kubernetes cluster
+  + **Self-Service Namespace Provisioning** for account users
+  + **Account Limits** to ensure quality of service and fairness when sharing a cluster
+  + **Namespace Templates** for secure tenant isolation and self-service namespace initialization
 
 [Loft](https://loft.sh) is a commercial offering from the maintainers of Kiosk and [DevSpace](https://github.com/devspace-cloud/devspace) that adds the following capabilities:
 
-- **Multi-cluster access** for granting access to spaces in different clusters
-- **Sleep mode** scales down deployments in a space during periods of inactivity
-- **Single sign-on** with OIDC authentication providers like GitHub
+  + **Multi-cluster access** for granting access to spaces in different clusters 
+  + **Sleep mode** scales down deployments in a space during periods of inactivity
+  + **Single sign-on** with OIDC authentication providers like GitHub
 
 There are three primary use cases that can be addressed by soft multi-tenancy.
 
@@ -43,15 +42,15 @@ The isolation provided by a container runtime may be acceptable within this sett
 
 ### Kubernetes as a Service
 
-By contrast, soft multi-tenancy can be used in settings where you want to offer Kubernetes as a service (KaaS). With KaaS, your application is hosted in a shared cluster along with a collection of controllers and CRDs that provide a set of PaaS services. Tenants interact directly with the Kubernetes API server and are permitted to perform CRUD operations on non-policy objects. There is also an element of self-service in that tenants may be allowed to create and manage their own namespaces. In this type of environment, tenants are assumed to be running untrusted code.
+By contrast, soft multi-tenancy can be used in settings where you want to offer Kubernetes as a service (KaaS). With KaaS, your application is hosted in a shared cluster along with a collection of controllers and CRDs that provide a set of PaaS services.  Tenants interact directly with the Kubernetes API server and are permitted to perform CRUD operations on non-policy objects. There is also an element of self-service in that tenants may be allowed to create and manage their own namespaces. In this type of environment, tenants are assumed to be running untrusted code.
 
-To isolate tenants in this type of environment, you will likely need to implement strict network policies as well as _pod sandboxing_. Sandboxing is where you run the containers of a pod inside a micro VM like Firecracker or in a user-space kernel. Today, you can create sandboxed pods with EKS Fargate.
+To isolate tenants in this type of environment, you will likely need to implement strict network policies as well as _pod sandboxing_. Sandboxing is where you run the containers of a pod inside a micro VM like Firecracker or in a user-space kernel.  Today, you can create sandboxed pods with EKS Fargate.
 
 ### Software as a Service (SaaS)
 
-The final use case for soft multi-tenancy is in a Software-as-a-Service (SaaS) setting. In this environment, each tenant is associated with a particular _instance_ of an application that's running within the cluster. Each instance often has its own data and uses separate access controls that are usually independent of Kubernetes RBAC.
+The final use case for soft multi-tenancy is in a Software-as-a-Service (SaaS) setting.  In this environment, each tenant is associated with a particular _instance_ of an application that's running within the cluster.  Each instance often has its own data and uses separate access controls that are usually independent of Kubernetes RBAC.
 
-Unlike the other use cases, the tenant in a SaaS setting does not directly interface with the Kubernetes API. Instead, the SaaS application is responsible for interfacing with the Kubernetes API to create the necessary objects to support each tenant.
+Unlike the other use cases, the tenant in a SaaS setting does not directly interface with the Kubernetes API.  Instead, the SaaS application is responsible for interfacing with the Kubernetes API to create the necessary objects to support each tenant.
 
 ## Kubernetes Constructs
 
@@ -72,21 +71,21 @@ Network policies are necessary but not sufficient. The enforcement of network po
 
 ### Role-based access control (RBAC)
 
-Roles and role bindings are the Kubernetes objects used to enforce role-based access control (RBAC) in Kubernetes. **Roles** contain lists of actions that can be performed against objects in your cluster. **Role bindings** specify the individuals or groups to whom the roles apply. In the enterprise and KaaS settings, RBAC can be used to permit administration of objects by selected groups or individuals.
+Roles and role bindings are the Kubernetes objects used to enforce role-based access control (RBAC) in Kubernetes. **Roles** contain lists of actions that can be performed against objects in your cluster. **Role bindings** specify the individuals or groups to whom the roles apply.  In the enterprise and KaaS settings, RBAC can be used to permit administration of objects by selected groups or individuals.
 
 ### Quotas
 
 Quotas are used to define limits on workloads hosted in your cluster. With quotas, you can specify the maximum amount of CPU and memory that a pod can consume, or you can limit the number of resources that can be allocated in a cluster or namespace. **Limit ranges** allow you to declare minimum, maximum, and default values for each limit.
 
-Overcommitting resources in a shared cluster is often beneficial because it allows you maximize your resources. However, unbounded access to a cluster can cause resource starvation, which can lead to performance degradation and loss of application availability. If a pod's requests are set too low and the actual resource utilization exceeds the capacity of the node, the node will begin to experience CPU or memory pressure. When this happens, pods may be restarted and/or evicted from the node.
+Overcommitting resources in a shared cluster is often beneficial because it allows you maximize your resources.  However, unbounded access to a cluster can cause resource starvation, which can lead to performance degradation and loss of application availability. If a pod's requests are set too low and the actual resource utilization exceeds the capacity of the node, the node will begin to experience CPU or memory pressure.  When this happens, pods may be restarted and/or evicted from the node.
 
-To prevent this from happening, you should plan to impose quotas on namespaces in a multi-tenant environment to force tenants to specify requests and limits when scheduling their pods on the cluster. It will also mitigate a potential denial of service by constraining the amount of resources a pod can consume.
+To prevent this from happening, you should plan to impose quotas on namespaces in a multi-tenant environment to force tenants to specify requests and limits when scheduling their pods on the cluster.  It will also mitigate a potential denial of service by constraining the amount of resources a pod can consume.
 
-You can also use quotas to apportion the cluster's resources to align with a tenant's spend. This is particularly useful in the KaaS scenario.
+You can also use quotas to apportion the cluster's resources to align with a tenant's spend.  This is particularly useful in the KaaS scenario.
 
 ### Pod priority and preemption
 
-Pod priority and preemption can be useful when you want to provide different qualities of services (QoS) for different customers. For example, with pod priority you can configure pods from customer A to run at a higher priority than customer B. When there's insufficient capacity available, the Kubelet will evict the lower-priority pods from customer B to accommodate the higher-priority pods from customer A. This can be especially handy in a SaaS environment where customers willing to pay a premium receive a higher quality of service.
+Pod priority and preemption can be useful when you want to provide different qualities of services (QoS) for different customers.  For example, with pod priority you can configure pods from customer A to run at a higher priority than customer B. When there's insufficient capacity available, the Kubelet will evict the lower-priority pods from customer B to accommodate the higher-priority pods from customer A.  This can be especially handy in a SaaS environment where customers willing to pay a premium receive a higher quality of service.
 
 ## Mitigating controls
 
@@ -111,7 +110,7 @@ There is also an experimental [OPA plugin for CoreDNS](https://github.com/coredn
 
 [Kyverno](https://kyverno.io) is a Kubernetes native policy engine that can validate, mutate, and generate configurations with policies as Kubernetes resources. Kyverno uses Kustomize-style overlays for validation, supports JSON Patch and strategic merge patch for mutation, and can clone resources across namespaces based on flexible triggers.
 
-You can use Kyverno to isolate namespaces, enforce pod security and other best practices, and generate default configurations such as network policies. Several examples are included in the GitHub [repository](https://github.com/aws/aws-eks-best-practices/tree/master/policies/kyverno) for this project. Many others are included in the [policy library](https://kyverno.io/policies/) on the Kyverno website.
+You can use Kyverno to isolate namespaces, enforce pod security and other best practices, and generate default configurations such as network policies.  Several examples are included in the GitHub [repository](https://github.com/aws/aws-eks-best-practices/tree/master/policies/kyverno) for this project. Many others are included in the [policy library](https://kyverno.io/policies/) on the Kyverno website.
 
 ### Datree
 
@@ -127,8 +126,8 @@ Restricting tenant workloads to run on specific nodes can be used to increase is
 
 Kubernetes [node affinity](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity) is used to target nodes for scheduling, based on node [labels](https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/). With node affinity rules, the pods are attracted to specific nodes that match the selector terms. In the below pod specification, the `requiredDuringSchedulingIgnoredDuringExecution` node affinity is applied to the respective pod. The result is that the pod will target nodes that are labeled with the following key/value: `tenant: tenants-x`.
 
-```yaml
----
+``` yaml
+...
 spec:
   affinity:
     nodeAffinity:
@@ -138,7 +137,8 @@ spec:
               - key: tenant
                 operator: In
                 values:
-                  - tenants-x
+            - tenants-x
+...
 ```
 
 With this node affinity, the label is required during scheduling, but not during execution; if the underlying nodes' labels change, the pods will not be evicted due solely to that label change. However, future scheduling could be impacted.
@@ -150,23 +150,25 @@ Instead of node affinity, we could have used the [node selector](https://kuberne
 
 Attracting pods to nodes is just the first part of this three-part approach. For this approach to work, we must repel pods from scheduling onto nodes for which the pods are not authorized. To repel unwanted or unauthorized pods, Kubernetes uses node [taints](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/). Taints are used to place conditions on nodes that prevent pods from being scheduled. The below taint uses a key-value pair of `tenant: tenants-x`.
 
-```yaml
----
-taints:
-  - key: tenant
-    value: tenants-x
-    effect: NoSchedule
+``` yaml
+...
+    taints:
+      - key: tenant
+        value: tenants-x
+        effect: NoSchedule
+...
 ```
 
 Given the above node `taint`, only pods that _tolerate_ the taint will be allowed to be scheduled on the node. To allow authorized pods to be scheduled onto the node, the respective pod specifications must include a `toleration` to the taint, as seen below.
 
-```yaml
----
-tolerations:
+``` yaml
+...
+  tolerations:
   - effect: NoSchedule
     key: tenant
     operator: Equal
     value: tenants-x
+...
 ```
 
 Pods with the above `toleration` will not be stopped from scheduling on the node, at least not because of that specific taint. Taints are also used by Kubernetes to temporarily stop pod scheduling during certain conditions, like node resource pressure. With node affinity, and taints and tolerations, we can effectively attract the desired pods to specific nodes and repel unwanted pods.
@@ -180,7 +182,7 @@ There are several tools that can be used to help manage the node affinity and to
 
 For example, pods destined for the _tenants-x_ namespace can be _stamped_ with the correct node affinity and toleration to permit scheduling on the _tenants-x_ nodes. Utilizing policy-management tools configured using the Kubernetes [Mutating Admission Webhook](https://kubernetes.io/docs/reference/access-authn-authz/admission-controllers/#mutatingadmissionwebhook), policies can be used to mutate the inbound pod specifications. The mutations add the needed elements to allow desired scheduling. An example OPA/Gatekeeper policy that adds a node affinity is seen below.
 
-```yaml
+``` yaml
 apiVersion: mutations.gatekeeper.sh/v1alpha1
 kind: Assign
 metadata:
@@ -210,7 +212,7 @@ The above policy is applied to a Kubernetes API server request, to apply a pod t
 
 A second policy, seen below, adds the toleration to the same pod specification, using the same matching criteria of target namespace and groups, kinds, and versions.
 
-```yaml
+``` yaml
 apiVersion: mutations.gatekeeper.sh/v1alpha1
 kind: Assign
 metadata:
@@ -239,7 +241,7 @@ The above policies are specific to pods; this is due to the paths to the mutated
 
 The result of these two mutations is that pods are attracted to the desired node, while at the same time, not repelled by the specific node taint. To verify this, we can see the snippets of output from two `kubectl` calls to get the nodes labeled with `tenant=tenants-x`, and get the pods in the `tenants-x` namespace.
 
-```bash
+``` bash
 kubectl get nodes -l tenant=tenants-x
 NAME
 ip-10-0-11-255...
@@ -259,7 +261,7 @@ As we can see from the above outputs, all the pods are scheduled on the nodes la
 
 An example mutated pod specification is seen below.
 
-```yaml
+``` yaml
 apiVersion: v1
 kind: Pod
 metadata:
@@ -275,35 +277,36 @@ spec:
                 operator: In
                 values:
                   - tenants-x
----
+...
 tolerations:
   - effect: NoSchedule
     key: tenant
     operator: Equal
     value: tenants-x
+...
 ```
 
 !!! attention
 Policy-management tools that are integrated to the Kubernetes API server request flow, using mutating and validating admission webhooks, are designed to respond to the API server's request within a specified timeframe. This is usually 3 seconds or less. If the webhook call fails to return a response within the configured time, the mutation and/or validation of the inbound API sever request may or may not occur. This behavior is based on whether the admission webhook configurations are set to [Fail Open or Fail Close](https://open-policy-agent.github.io/gatekeeper/website/docs/#admission-webhook-fail-open-by-default).
 
-In the above examples, we used policies written for OPA/Gatekeeper. However, there are other policy management tools that handle our node-selection use case as well. For example, this [Kyverno policy](https://kyverno.io/policies/other/add_node_affinity/add_node_affinity/) could be used to handle the node affinity mutation. // TODO: check
+In the above examples, we used policies written for OPA/Gatekeeper. However, there are other policy management tools that handle our node-selection use case as well. For example, this [Kyverno policy](https://kyverno.io/policies/other/add_node_affinity/add_node_affinity/) could be used to handle the node affinity mutation.
 
 !!! tip
 If operating correctly, mutating policies will effect the desired changes to inbound API server request payloads. However, validating policies should also be included to verify that the desired changes occur, before changes are allowed to persist. This is especially important when using these policies for tenant-to-node isolation. It is also a good idea to include _Audit_ policies to routinely check your cluster for unwanted configurations.
 
 ### References
 
-- [k-rail](https://github.com/cruise-automation/k-rail) Designed to help you secure a multi-tenant environment through the enforcement of certain policies.
++ [k-rail](https://github.com/cruise-automation/k-rail) Designed to help you secure a multi-tenant environment through the enforcement of certain policies. 
 
-- [Security Practices for MultiTenant SaaS Applications using Amazon EKS](https://d1.awsstatic.com/whitepapers/security-practices-for-multi-tenant-saas-apps-using-eks.pdf)
++ [Security Practices for MultiTenant SaaS Applications using Amazon EKS](https://d1.awsstatic.com/whitepapers/security-practices-for-multi-tenant-saas-apps-using-eks.pdf)
 
 ## Hard multi-tenancy
 
-Hard multi-tenancy can be implemented by provisioning separate clusters for each tenant. While this provides very strong isolation between tenants, it has several drawbacks.
+Hard multi-tenancy can be implemented by provisioning separate clusters for each tenant.  While this provides very strong isolation between tenants, it has several drawbacks.
 
-First, when you have many tenants, this approach can quickly become expensive. Not only will you have to pay for the control plane costs for each cluster, you will not be able to share compute resources between clusters. This will eventually cause fragmentation where a subset of your clusters are underutilized while others are overutilized.
+First, when you have many tenants, this approach can quickly become expensive. Not only will you have to pay for the control plane costs for each cluster, you will not be able to share compute resources between clusters.  This will eventually cause fragmentation where a subset of your clusters are underutilized while others are overutilized.
 
-Second, you will likely need to buy or build special tooling to manage all of these clusters. In time, managing hundreds or thousands of clusters may simply become too unwieldy.
+Second, you will likely need to buy or build special tooling to manage all of these clusters.  In time, managing hundreds or thousands of clusters may simply become too unwieldy.
 
 Finally, creating a cluster per tenant will be slow relative to a creating a namespace. Nevertheless, a hard-tenancy approach may be necessary in highly-regulated industries or in SaaS environments where strong isolation is required.
 
@@ -319,10 +322,10 @@ The [Multi-Tenancy Benchmarks](https://github.com/kubernetes-sigs/multi-tenancy/
 
 ## Multi-cluster management resources
 
-- [Banzai Cloud](https://banzaicloud.com/)
-- [Kommander](https://d2iq.com/solutions/ksphere/kommander)
-- [Lens](https://github.com/lensapp/lens)
-- [Nirmata](https://nirmata.com)
-- [Rafay](https://rafay.co/)
-- [Rancher](https://rancher.com/products/rancher/)
-- [Weave Flux](https://www.weave.works/oss/flux/)
++ [Banzai Cloud](https://banzaicloud.com/)
++ [Kommander](https://d2iq.com/solutions/ksphere/kommander)
++ [Lens](https://github.com/lensapp/lens)
++ [Nirmata](https://nirmata.com)
++ [Rafay](https://rafay.co/)
++ [Rancher](https://rancher.com/products/rancher/)
++ [Weave Flux](https://www.weave.works/oss/flux/)

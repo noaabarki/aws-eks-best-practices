@@ -133,11 +133,11 @@ spec:
     nodeAffinity:
       requiredDuringSchedulingIgnoredDuringExecution:
         nodeSelectorTerms:
-          - matchExpressions:
-              - key: tenant
-                operator: In
-                values:
-            - tenants-x
+        - matchExpressions:
+            - key: tenant
+              operator: In
+              values:
+          - tenants-x
 ...
 ```
 

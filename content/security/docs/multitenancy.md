@@ -201,11 +201,11 @@ spec:
   parameters:
     assign:
       value: 
-      - matchExpressions:
-          - key: "tenant"
-            operator: In
-            values:
-            - "tenants-x"
+        - matchExpressions:
+            - key: "tenant"
+              operator: In
+              values:
+              - "tenants-x"
 ```
 
 The above policy is applied to a Kubernetes API server request, to apply a pod to the _tenants-x_ namespace. The policy adds the `requiredDuringSchedulingIgnoredDuringExecution` node affinity rule, so that pods are attracted to nodes with the `tenant: tenants-x` label.

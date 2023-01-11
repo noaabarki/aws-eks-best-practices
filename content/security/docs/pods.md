@@ -98,12 +98,11 @@ To implement the controls defined by the PSS, PSA operates in three modes:
 
 + **audit:** Policy violations will trigger the addition of an audit annotation to the event recorded in the audit log, but are otherwise allowed.
 
-+ **warn:**     Policy violations will trigger a user-facing warning, but are otherwise allowed.
++ **warn:**	Policy violations will trigger a user-facing warning, but are otherwise allowed.
 
 These modes and the profile (restriction) levels are configured at the Kubernetes Namespace level, using labels, as seen in the below example.
 
 ```yaml
-...
 apiVersion: v1
 kind: Namespace
 metadata:
@@ -117,7 +116,7 @@ When used independently, these operational modes have different responses that r
 This is a difficult user experience, as there is no immediate indication that the successfully applied Deployment object belies failed pod creation. The offending podSpecs will not create pods. Inspecting the Deployment resource with `kubectl get deploy <DEPLOYMENT_NAME> -oyaml` will expose the message from the failed pod(s) `.status.conditions` element, as seen below.
 
 ```yaml
----
+...
 status:
   conditions:
     - lastTransitionTime: "2022-01-20T01:02:08Z"
@@ -313,7 +312,7 @@ In the above example, with _enforce_ mode defined, when a Deployment manifest wi
 
 ### Restrict the containers that can run as privileged
 
-As mentioned, containers that run as privileged inherit all of the Linux capabilities assigned to root on the host. Seldom do containers need these types of privileges to function properly. There are multiple methods that can be used to restrict the permissions and capabilities of containers.
+As mentioned, containers that run as privileged inherit all of the Linux capabilities assigned to root on the host.  Seldom do containers need these types of privileges to function properly.  There are multiple methods that can be used to restrict the permissions and capabilities of containers.
 
 !!! Attention
 
@@ -327,10 +326,10 @@ To enforce the use of the `spec.securityContext`, and its associated elements, w
 
 ### Never run Docker in Docker or mount the socket in the container
 
-While this conveniently lets you to build/run images in Docker containers, you're basically relinquishing complete control of the node to the process running in the container. If you need to build container images on Kubernetes use [Kaniko](https://github.com/GoogleContainerTools/kaniko), [buildah](https://github.com/containers/buildah), [img](https://github.com/genuinetools/img), or a build service like [CodeBuild](https://docs.aws.amazon.com/codebuild/latest/userguide/welcome.html) instead.
+While this conveniently lets you to build/run images in Docker containers, you're basically relinquishing complete control of the node to the process running in the container. If you need to build container images on Kubernetes use [Kaniko](https://github.com/GoogleContainerTools/kaniko), [buildah](https://github.com/containers/buildah), [img](https://github.com/genuinetools/img), or a build service like [CodeBuild](https://docs.aws.amazon.com/codebuild/latest/userguide/welcome.html) instead. 
 
 !!! Tip
-
+    
     Kubernetes clusters used for CICD processing, such as building container images, should be isolated from clusters running more generalized workloads.
 
 ### Restrict the use of hostPath or if hostPath is necessary restrict which prefixes can be used and configure the volume as read-only
@@ -363,6 +362,7 @@ _Limits_ are the maximum amount of CPU and memory resources that a container is 
     When using container `resources.limits` it is strongly recommended that container resource usage (a.k.a. Resource Footprints) be data-driven and accurate, based on load testing. Absent an accurate and trusted resource footprint, container `resources.limits` can be padded. For example, `resources.limits.memory` could be padded 20-30% higher than observable maximums, to account for potential memory resource limit inaccuracies.
 
 Kubernetes uses three Quality of Service (QoS) classes to prioritize the workloads running on a node.  These include:
+
 + guaranteed
 + burstable
 + best-effort
@@ -370,8 +370,8 @@ Kubernetes uses three Quality of Service (QoS) classes to prioritize the workloa
 If limits and requests are not set, the pod is configured as _best-effort_ (lowest priority).  Best-effort pods are the first to get killed when there is insufficient memory.  If limits are set on _all_ containers within the pod, or if the requests and limits are set to the same values and not equal to 0, the pod is configured as _guaranteed_ (highest priority).  Guaranteed pods will not be killed unless they exceed their configured memory limits. If the limits and requests are configured with different values and not equal to 0, or one container within the pod sets limits and the others don’t or have limits set for different resources, the pods are configured as _burstable_ (medium priority). These pods have some resource guarantees, but can be killed once they exceed their requested memory. 
 
 !!! Attention
-
-    Requests don't affect the `memory_limit_in_bytes` value of the container's cgroup; the cgroup limit is set to the amount of memory available on the host. Nevertheless, setting the requests value too low could cause the pod to be targeted for termination by the kubelet if the node undergoes memory pressure.
+    
+    Requests don't affect the `memory_limit_in_bytes` value of the container's cgroup; the cgroup limit is set to the amount of memory available on the host. Nevertheless, setting the requests value too low could cause the pod to be targeted for termination by the kubelet if the node undergoes memory pressure. 
 
 | Class | Priority | Condition | Kill Condition |
 | :-- | :-- | :-- | :-- |
@@ -396,7 +396,7 @@ automatic mounting of a ServiceAccount token on a pod spec, or for all pods that
 use a particular ServiceAccount.
 
 !!! Attention
-
+    
     Disabling ServiceAccount mounting does not prevent a pod from having network
     access to the Kubernetes API. To prevent a pod from having any network
     access to the Kubernetes API, you will need to modify the [EKS cluster
@@ -437,7 +437,7 @@ the [Kubernetes docs on Pod DNS policy][dns-policy] for more information.
 [dns-policy]: https://kubernetes.io/docs/concepts/services-networking/dns-pod-service/#pod-s-dns-policy
 
 !!! Attention
-
+    
     Disabling service links and changing the pod's DNS policy does not prevent a
     pod from having network access to the in-cluster DNS service. An attacker
     can still enumerate services in a cluster by reaching the in-cluster DNS
@@ -451,8 +451,8 @@ kind: Pod
 metadata:
   name: pod-no-service-info
 spec:
-  dnsPolicy: Default # "Default" is not the true default value
-  enableServiceLinks: false
+    dnsPolicy: Default # "Default" is not the true default value
+    enableServiceLinks: false
 ```
 
 ### Configure your images with read-only root file system
@@ -483,4 +483,4 @@ Policy-as-code and Pod Security Standards can be used to enforce this behavior.
 + [Datree built-in rules for EKS](https://hub.datree.io/built-in-rules/rules/#EKS)
 + [Policy based countermeasures: part 1](https://aws.amazon.com/blogs/containers/policy-based-countermeasures-for-kubernetes-part-1/)
 + [Policy based countermeasures: part 2](https://aws.amazon.com/blogs/containers/policy-based-countermeasures-for-kubernetes-part-2/)
-+ [Pod Security Policy Migrator](https://appvia.github.io/psp-migration/) a tool that converts PSPs to OPA/Gatekeeper, KubeWarden, or Kyverno policies
++ [Pod Security Policy Migrator](https://appvia.github.io/psp-migration/) a tool that converts PSPs to OPA/Gatekeeper, KubeWarden, or Kyverno policies 

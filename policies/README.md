@@ -6,4 +6,4 @@ In the second (/alternative-gatekeeper) we have another documented example of Ga
 
 In /datree, you will find many examples of Datree's built-in rules for EKS such as pod and network security best practices, multi-tanency, requiring readiness and liveness probes, and blocking use of the latest tag.
 
-Datree's policy can be used by simply installing Datree and enabling monitoring with its built-in rules for EKS. You can find additional policies included in Datree's built-in policy for EKS in the [Datree documentation](https://hub.datree.io/) as well as information on how to get started with Datree.
+Datree's policy can be used by simply installing [Datree](https://github.com/datreeio/datree) and enabling monitoring with its built-in rules for EKS. You can find additional policies included in Datree's built-in policy for EKS in the [Datree documentation](https://hub.datree.io/) as well as information on how to get started with Datree.

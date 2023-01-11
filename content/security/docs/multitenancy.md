@@ -133,10 +133,10 @@ spec:
     nodeAffinity:
       requiredDuringSchedulingIgnoredDuringExecution:
         nodeSelectorTerms:
-          - matchExpressions:
-              - key: tenant
-                operator: In
-                values:
+        - matchExpressions:
+          - key: tenant
+            operator: In
+            values:
             - tenants-x
 ...
 ```
@@ -192,20 +192,20 @@ metadata:
       Adds Node affinity - https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#node-affinity
 spec:
   applyTo:
-    - groups: [""]
-      kinds: ["Pod"]
-      versions: ["v1"]
+  - groups: [""]
+    kinds: ["Pod"]
+    versions: ["v1"]
   match:
     namespaces: ["tenants-x"]
   location: "spec.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms"
   parameters:
     assign:
-      value:
+      value: 
         - matchExpressions:
-            - key: "tenant"
-              operator: In
-              values:
-                - "tenants-x"
+          - key: "tenant"
+            operator: In
+            values:
+            - "tenants-x"
 ```
 
 The above policy is applied to a Kubernetes API server request, to apply a pod to the _tenants-x_ namespace. The policy adds the `requiredDuringSchedulingIgnoredDuringExecution` node affinity rule, so that pods are attracted to nodes with the `tenant: tenants-x` label.
@@ -222,19 +222,19 @@ metadata:
       Adds toleration - https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
 spec:
   applyTo:
-    - groups: [""]
-      kinds: ["Pod"]
-      versions: ["v1"]
+  - groups: [""]
+    kinds: ["Pod"]
+    versions: ["v1"]
   match:
     namespaces: ["tenants-x"]
   location: "spec.tolerations"
   parameters:
     assign:
-      value:
-        - key: "tenant"
-          operator: "Equal"
-          value: "tenants-x"
-          effect: "NoSchedule"
+      value: 
+      - key: "tenant"
+        operator: "Equal"
+        value: "tenants-x"
+        effect: "NoSchedule"
 ```
 
 The above policies are specific to pods; this is due to the paths to the mutated elements in the policies' `location` elements. Additional policies could be written to handle resources that create pods, like Deployment and Job resources. The listed policies and other examples can been seen in the companion [GitHub project](https://github.com/aws/aws-eks-best-practices/tree/master/policies/opa/gatekeeper/node-selector) for this guide.
@@ -243,7 +243,7 @@ The result of these two mutations is that pods are attracted to the desired node
 
 ``` bash
 kubectl get nodes -l tenant=tenants-x
-NAME
+NAME                                        
 ip-10-0-11-255...
 ip-10-0-28-81...
 ip-10-0-43-107...
@@ -272,13 +272,13 @@ spec:
     nodeAffinity:
       requiredDuringSchedulingIgnoredDuringExecution:
         nodeSelectorTerms:
-          - matchExpressions:
-              - key: tenant
-                operator: In
-                values:
-                  - tenants-x
+        - matchExpressions:
+          - key: tenant
+            operator: In
+            values:
+            - tenants-x
 ...
-tolerations:
+  tolerations:
   - effect: NoSchedule
     key: tenant
     operator: Equal
@@ -287,12 +287,12 @@ tolerations:
 ```
 
 !!! attention
-Policy-management tools that are integrated to the Kubernetes API server request flow, using mutating and validating admission webhooks, are designed to respond to the API server's request within a specified timeframe. This is usually 3 seconds or less. If the webhook call fails to return a response within the configured time, the mutation and/or validation of the inbound API sever request may or may not occur. This behavior is based on whether the admission webhook configurations are set to [Fail Open or Fail Close](https://open-policy-agent.github.io/gatekeeper/website/docs/#admission-webhook-fail-open-by-default).
+    Policy-management tools that are integrated to the Kubernetes API server request flow, using mutating and validating admission webhooks, are designed to respond to the API server's request within a specified timeframe. This is usually 3 seconds or less. If the webhook call fails to return a response within the configured time, the mutation and/or validation of the inbound API sever request may or may not occur. This behavior is based on whether the admission webhook configurations are set to [Fail Open or Fail Close](https://open-policy-agent.github.io/gatekeeper/website/docs/#admission-webhook-fail-open-by-default).
 
 In the above examples, we used policies written for OPA/Gatekeeper. However, there are other policy management tools that handle our node-selection use case as well. For example, this [Kyverno policy](https://kyverno.io/policies/other/add_node_affinity/add_node_affinity/) could be used to handle the node affinity mutation.
 
 !!! tip
-If operating correctly, mutating policies will effect the desired changes to inbound API server request payloads. However, validating policies should also be included to verify that the desired changes occur, before changes are allowed to persist. This is especially important when using these policies for tenant-to-node isolation. It is also a good idea to include _Audit_ policies to routinely check your cluster for unwanted configurations.
+    If operating correctly, mutating policies will effect the desired changes to inbound API server request payloads. However, validating policies should also be included to verify that the desired changes occur, before changes are allowed to persist. This is especially important when using these policies for tenant-to-node isolation. It is also a good idea to include _Audit_ policies to routinely check your cluster for unwanted configurations.
 
 ### References
 
@@ -301,7 +301,6 @@ If operating correctly, mutating policies will effect the desired changes to inb
 + [Security Practices for MultiTenant SaaS Applications using Amazon EKS](https://d1.awsstatic.com/whitepapers/security-practices-for-multi-tenant-saas-apps-using-eks.pdf)
 
 ## Hard multi-tenancy
-
 Hard multi-tenancy can be implemented by provisioning separate clusters for each tenant.  While this provides very strong isolation between tenants, it has several drawbacks.
 
 First, when you have many tenants, this approach can quickly become expensive. Not only will you have to pay for the control plane costs for each cluster, you will not be able to share compute resources between clusters.  This will eventually cause fragmentation where a subset of your clusters are underutilized while others are overutilized.

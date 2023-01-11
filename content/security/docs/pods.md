@@ -227,7 +227,7 @@ webhooks:
   # Audit annotations will be prefixed with this name
   - name: "pod-security-webhook.kubernetes.io"
     # Fail-closed admission webhooks can present operational challenges.
-    # You may want to consider using a failure policy of Ignore, but should
+    # You may want to consider using a failure policy of Ignore, but should 
     # consider the security tradeoffs.
     failurePolicy: Fail
     namespaceSelector:
@@ -253,38 +253,38 @@ The following list of Pros and Cons is designed help you make a more informed de
 
 Pros:
 
-+ More flexible and more granular (down to attributes of resources if need be)
-+ Not just focused on pods, can be used against different resources and actions
-+ Not just applied at the namespace level
-+ More mature than the Pod Security Standards
-+ Decisions can be based on anything in the API server request payload, as well as existing cluster resources and external data (solution dependent)
-+ Supports mutating API server requests before validation (solution dependent)
-+ Can generate complementary policies and Kubernetes resources (solution dependent - From pod policies, Kyverno can [auto-gen](https://kyverno.io/docs/writing-policies/autogen/) policies for higher-level controllers, such as Deployments. Kyverno can also generate additional Kubernetes resources _"when a new resource is created or when the source is updated"_ by using [Generate Rules](https://kyverno.io/docs/writing-policies/generate/).)
-+ Can be used to shift left, into CICD pipelines, before making calls to the Kubernetes API server (solution dependent)
-+ Can be used to implement behaviors that are not necessarily security related, such as best practices, organizational standards, etc.
-+ Can be used in non-Kubernetes use cases (solution dependent)
-+ Because of flexibility, the user experience can be tuned to users' needs
+  + More flexible and more granular (down to attributes of resources if need be)
+  + Not just focused on pods, can be used against different resources and actions
+  + Not just applied at the namespace level
+  + More mature than the Pod Security Standards
+  + Decisions can be based on anything in the API server request payload, as well as existing cluster resources and external data (solution dependent)
+  + Supports mutating API server requests before validation (solution dependent)
+  + Can generate complementary policies and Kubernetes resources (solution dependent - From pod policies, Kyverno can [auto-gen](https://kyverno.io/docs/writing-policies/autogen/) policies for higher-level controllers, such as Deployments. Kyverno can also generate additional Kubernetes resources _"when a new resource is created or when the source is updated"_ by using [Generate Rules](https://kyverno.io/docs/writing-policies/generate/).)
+  + Can be used to shift left, into CICD pipelines, before making calls to the Kubernetes API server (solution dependent)
+  + Can be used to implement behaviors that are not necessarily security related, such as best practices, organizational standards, etc.
+  + Can be used in non-Kubernetes use cases (solution dependent)
+  + Because of flexibility, the user experience can be tuned to users' needs
 
 Cons:
 
-+ Not built into Kubernetes
-+ More complex to learn, configure, and support
-+ Policy authoring may require new skills/languages/capabilities
+  + Not built into Kubernetes
+  + More complex to learn, configure, and support
+  + Policy authoring may require new skills/languages/capabilities
 
 **Pod Security Admission (as compared to policy-as-code)**
 
 Pros:
 
-+ Built into Kubernetes
-+ Simpler to configure
-+ No new languages to use or policies to author
-+ If the cluster default admission level is configured to _privileged_, namespace labels can be used to opt namespaces into the pod security profiles.
+  + Built into Kubernetes
+  + Simpler to configure
+  + No new languages to use or policies to author
+  + If the cluster default admission level is configured to _privileged_, namespace labels can be used to opt namespaces into the pod security profiles.
 
 Cons:
 
-+ Not as flexible or granular as policy-as-code
-+ Only 3 levels of restrictions
-+ Primarily focused on pods
+  + Not as flexible or granular as policy-as-code
+  + Only 3 levels of restrictions
+  + Primarily focused on pods
 
 #### Summary
 
@@ -314,8 +314,8 @@ In the above example, with _enforce_ mode defined, when a Deployment manifest wi
 
 As mentioned, containers that run as privileged inherit all of the Linux capabilities assigned to root on the host.  Seldom do containers need these types of privileges to function properly.  There are multiple methods that can be used to restrict the permissions and capabilities of containers.
 
-!!! Attention
-
+!!! Attention 
+    
     Fargate is a launch type that enables you to run "serverless" container(s) where the containers of a pod are run on infrastructure that AWS manages. With Fargate, you cannot run a privileged container or configure your pod to use hostNetwork or hostPort.
 
 ### Do not run processes in containers as root
@@ -361,7 +361,7 @@ _Limits_ are the maximum amount of CPU and memory resources that a container is 
 
     When using container `resources.limits` it is strongly recommended that container resource usage (a.k.a. Resource Footprints) be data-driven and accurate, based on load testing. Absent an accurate and trusted resource footprint, container `resources.limits` can be padded. For example, `resources.limits.memory` could be padded 20-30% higher than observable maximums, to account for potential memory resource limit inaccuracies.
 
-Kubernetes uses three Quality of Service (QoS) classes to prioritize the workloads running on a node.  These include:
+Kubernetes uses three Quality of Service (QoS) classes to prioritize the workloads running on a node.  These include: 
 
 + guaranteed
 + burstable
@@ -470,7 +470,7 @@ Policy-as-code and Pod Security Standards can be used to enforce this behavior.
 
 
 !!! Info 
-
+    
     As per [Windows containers in Kubernetes](https://kubernetes.io/docs/concepts/windows/intro/) `securityContext.readOnlyRootFilesystem` cannot be set to
     `true` for a container running on Windows as write access is required for registry and system processes to run inside the container.
 

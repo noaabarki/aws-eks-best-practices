@@ -37,7 +37,8 @@ Creating and managing seccomp and Apparmor profiles can be difficult if you're n
 ### Consider add/dropping Linux capabilities before writing seccomp policies
 Capabilities involve various checks in kernel functions reachable by syscalls. If the check fails, the syscall typically returns an error. The check can be done either right at the beginning of a specific syscall, or deeper in the kernel in areas that might be reachable through multiple different syscalls (such as writing to a specific privileged file).  Seccomp, on the other hand, is a syscall filter which is applied to all syscalls before they are run. A process can set up a filter which allows them to revoke their right to run certain syscalls, or specific arguments for certain syscalls. 
 
-Before using seccomp, consider whether adding/removing Linux capabilities gives you the control you need. See [https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-capabilities-for-a-container](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-capabilities-for-a-container) for further information. 
+Before using seccomp, consider whether adding/removing Linux capabilities gives you the control you need. See [https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-capabilities-for-a-container](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-capabilities-for-a-container) for further information.
+
 ### See whether you can accomplish your aims by using Pod Security Policies (PSPs)
 Pod Security Policies offer a lot of different ways to improve your security posture without introducing undue complexity. Explore the options available in PSPs before venturing into building seccomp and Apparmor profiles.
 
@@ -46,7 +47,6 @@ As of Kubernetes 1.25, PSPs have been removed and replaced with the [Pod Securit
 Alternatively, you can use [Datree's EKS built in rules](https://hub.datree.io/built-in-rules/rules/#EKS) to regularly scan the cluster for policy violations, monitor and enforce pod security standards or create your own policy to make sure you follow other EKS best practices.
 
 ## Additional Resources
-
 + [7 things you should know before you start](https://itnext.io/seccomp-in-kubernetes-part-i-7-things-you-should-know-before-you-even-start-97502ad6b6d6)
 + [AppArmor Loader](https://github.com/kubernetes/kubernetes/tree/master/test/images/apparmor-loader)
 + [Setting up nodes with profiles](https://kubernetes.io/docs/tutorials/clusters/apparmor/#setting-up-nodes-with-profiles)
@@ -54,7 +54,6 @@ Alternatively, you can use [Datree's EKS built in rules](https://hub.datree.io/b
 + [seccomp-operator](https://github.com/kubernetes-sigs/seccomp-operator) Is similar to the AppArmor Loader, only instead of AppArmor profiles, it creates a seccomp profiles on each host 
 
 ## Tools
-
 + [Aqua](https://www.aquasec.com/products/aqua-cloud-native-security-platform/)
 + [Qualys](https://www.qualys.com/apps/container-security/)
 + [Stackrox](https://www.stackrox.com/use-cases/threat-detection/)

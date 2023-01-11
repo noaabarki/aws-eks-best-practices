@@ -192,9 +192,9 @@ metadata:
       Adds Node affinity - https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#node-affinity
 spec:
   applyTo:
-    - groups: [""]
-      kinds: ["Pod"]
-      versions: ["v1"]
+  - groups: [""]
+    kinds: ["Pod"]
+    versions: ["v1"]
   match:
     namespaces: ["tenants-x"]
   location: "spec.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms"
@@ -205,7 +205,7 @@ spec:
           - key: "tenant"
             operator: In
             values:
-              - "tenants-x"
+            - "tenants-x"
 ```
 
 The above policy is applied to a Kubernetes API server request, to apply a pod to the _tenants-x_ namespace. The policy adds the `requiredDuringSchedulingIgnoredDuringExecution` node affinity rule, so that pods are attracted to nodes with the `tenant: tenants-x` label.

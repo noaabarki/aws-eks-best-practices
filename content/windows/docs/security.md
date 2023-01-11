@@ -17,7 +17,7 @@ Windows pods in Kubernetes have some limitations and differentiators from standa
 
 Windows uses a Job object per container with a system namespace filter to contain all processes in a container and provide logical isolation from the host. There is no way to run a Windows container without the namespace filtering in place. This means that system privileges cannot be asserted in the context of the host, and thus privileged containers are not available on Windows.
 
-The following `windowsOptions` are the only documented [Windows Security Context options](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.20/#windowssecuritycontextoptions-v1-core) while the rest are general [Security Context options](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#securitycontext-v1-core(https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#securitycontext-v1-core))
+The following `windowsOptions` are the only documented [Windows Security Context options](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.20/#windowssecuritycontextoptions-v1-core) while the rest are general [Security Context options](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#securitycontext-v1-core (https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#securitycontext-v1-core))
 
 For a list of security context attributes that are supported in Windows vs linux, please refer to the official documentation [here](https://kubernetes.io/docs/setup/production-environment/windows/_print/#v1-container).
 

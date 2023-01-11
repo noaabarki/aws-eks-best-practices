@@ -9,13 +9,13 @@ Start by removing all extraneous binaries from the container image.  If you’re
 ```bash
 find / -perm /6000 -type f -exec ls -ld {} \;
 ```
-
+    
 To remove the special permissions from these files, add the following directive to your container image:
 ```dockerfile
 RUN find / -xdev -perm /6000 -type f -exec chmod a-s {} \; || true
 ```
-Colloquially, this is known as de-fanging your image.
-
+Colloquially, this is known as de-fanging your image. 
+  
 ### Use multi-stage builds
 Using multi-stage builds is a way to create minimal images. Oftentimes, multi-stage builds are used to automate parts of the Continuous Integration cycle.  For example, multi-stage builds can be used to lint your source code or perform static code analysis.  This affords developers an opportunity to get near immediate feedback instead of waiting for a pipeline to execute.  Multi-stage builds are attractive from a security standpoint because they allow you to minimize the size of the final image pushed to your container registry.  Container images devoid of build tools and other extraneous binaries improves your security posture by reducing the attack surface of the image. For additional information about multi-stage builds, see [https://docs.docker.com/develop/develop-images/multistage-build/](https://docs.docker.com/develop/develop-images/multistage-build/).
 
@@ -30,7 +30,7 @@ Knowing where images with vulnerabilities have been deployed is essential to kee
 + [Kubei](https://github.com/Portshift/kubei)
 + [Trivy](https://github.com/aquasecurity/trivy)
 + [Snyk](https://support.snyk.io/hc/en-us/articles/360003946917-Test-images-with-the-Snyk-Container-CLI)
-
+    
 A Kubernetes validation webhook could also be used to validate that images are free of critical vulnerabilities.  Validation webhooks are invoked prior to the Kubernetes API.  They are typically used to reject requests that don't comply with the validation criteria defined in the webhook.  [This](https://aws.amazon.com/blogs/containers/building-serverless-admission-webhooks-for-kubernetes-with-aws-sam/) is an example of a serverless webhook that calls the ECR describeImageScanFindings API to determine whether a pod is pulling an image with critical vulnerabilities.  If vulnerabilities are found, the pod is rejected and a message with list of CVEs is returned as an Event.
 
 ### Create IAM policies for ECR repositories
@@ -62,6 +62,7 @@ Nowadays, it is not uncommon for an organization to have multiple development te
 
 ### Consider using ECR private endpoints
 The ECR API has a public endpoint.  Consequently, ECR registries can be accessed from the Internet so long as the request has been authenticated and authorized by IAM. For those who need to operate in a sandboxed environment where the cluster VPC lacks an Internet Gateway (IGW), you can configure a private endpoint for ECR.  Creating a private endpoint enables you to privately access the ECR API through a private IP address instead of routing traffic across the Internet. For additional information on this topic, see https://docs.aws.amazon.com/AmazonECR/latest/userguide/vpc-endpoints.html.
+
 ### Implement endpoint policies for ECR
 The default endpoint policy for allows access to all ECR repositories within a region.  This might allow an attacker/insider to exfiltrate data by packaging it as a container image and pushing it to a registry in another AWS account.  Mitigating this risk involves creating an endpoint policy that limits API access to ECR repositories. For example, the following policy allows all AWS principles in your account to perform all actions against your and only your ECR repositories:
 
@@ -78,7 +79,7 @@ The default endpoint policy for allows access to all ECR repositories within a r
   ]
 }
 ```
-You can enhance this further by setting a condition that uses the new `PrincipalOrgID` attribute which will prevent pushing/pulling of images by an IAM principle that is not part of your AWS Organization. See, [aws:PrincipalOrgID](https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html#condition-keys-principalorgid) for additional details.
+You can enhance this further by setting a condition that uses the new `PrincipalOrgID` attribute which will prevent pushing/pulling of images by an IAM principle that is not part of your AWS Organization. See, [aws:PrincipalOrgID](https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html#condition-keys-principalorgid) for additional details. 
 
 We recommended applying the same policy to both the `com.amazonaws.<region>.ecr.dkr` and the `com.amazonaws.<region>.ecr.api` endpoints.
 
@@ -92,7 +93,7 @@ Since EKS pulls images for kube-proxy, coredns, and aws-node from ECR, you will 
   | 918309763551 | BJS | 
   | 961992271922 | ZHY |
 
-For further information about using endpoint policies, see [Using VPC endpoint policies to control Amazon ECR access](https://aws.amazon.com/blogs/containers/using-vpc-endpoint-policies-to-control-amazon-ecr-access/).
+For further information about using endpoint policies, see [Using VPC endpoint policies to control Amazon ECR access](https://aws.amazon.com/blogs/containers/using-vpc-endpoint-policies-to-control-amazon-ecr-access/). 
 
 ### Implement lifecycle policies for ECR
 
@@ -105,7 +106,7 @@ Each ECR repository can have a lifecycle policy that sets rules for when images 
 * Filtering by image tags, either in multiple rules or a single rule
 
 !!! warning
-If the image for long running application is purged from ECR, it can cause an image pull errors when the application is redeployed or scaled horizontally. When using image lifecycle policies, be sure you have good CI/CD practices in place to keep deployments and the images that they reference up to date and always create [image] expiry rules that account for how often you do releases/deployments.
+    If the image for long running application is purged from ECR, it can cause an image pull errors when the application is redeployed or scaled horizontally. When using image lifecycle policies, be sure you have good CI/CD practices in place to keep deployments and the images that they reference up to date and always create [image] expiry rules that account for how often you do releases/deployments. 
 
 ### Create a set of curated images
 Rather than allowing developers to create their own images, consider creating a set of vetted images for the different application stacks in your organization.  By doing so, developers can forego learning how to compose Dockerfiles and concentrate on writing code.  As changes are merged into Master, a CI/CD pipeline can automatically compile the asset, store it in an artifact repository and copy the artifact into the appropriate image before pushing it to a Docker registry like ECR. At the very least you should create a set of base images from which developers to create their own Dockerfiles.  Ideally, you want to avoid pulling images from Dockerhub because a) you don't always know what is in the image and b) about [a fifth](https://www.kennasecurity.com/blog/one-fifth-of-the-most-used-docker-containers-have-at-least-one-critical-vulnerability/) of the top 1000 images have vulnerabilities. A list of those images and their vulnerabilities can be found at https://vulnerablecontainers.org/.
@@ -116,9 +117,8 @@ As was mentioned in the pod security section, you should avoid running container
 ### Lint your Dockerfiles
 Linting can be used to verify that your Dockerfiles are adhering to a set of predefined guidelines, e.g. the inclusion of the `USER` directive or the requirement that all images be tagged.  [dockerfile_lint](https://github.com/projectatomic/dockerfile_lint) is an open source project from RedHat that verifies common best practices and includes a rule engine that you can use to build your own rules for linting Dockerfiles. It can be incorporated into a CI pipeline, in that builds with Dockerfiles that violate a rule will automatically fail. 
 
-### Build images from Scratch
+### Build images from Scratch 
 Reducing the attack surface of your container images should be primary aim when building images.  The ideal way to do this is by creating minimal images that are devoid of binaries that can be used to exploit vulnerabilities. Fortunately, Docker has a mechanism to create images from [`scratch`](https://docs.docker.com/develop/develop-images/baseimages/#create-a-simple-parent-image-using-scratch). With languages like Go, you can create a static linked binary and reference it in your Dockerfile as in this example: 
-
 ```dockerfile
 ############################
 # STEP 1 build executable binary
@@ -146,7 +146,7 @@ ENTRYPOINT ["/go/bin/hello"]
 This creates a container image that consists of your application and nothing else, making it extremely secure.
 
 ### Use immutable tags with ECR
-[Immutable tags](https://aws.amazon.com/about-aws/whats-new/2019/07/amazon-ecr-now-supports-immutable-image-tags/) force you to update the image tag on each push to the image repository. This can thwart an attacker from overwriting an image with a malicious version without changing the image's tags. Additionally, it gives you a way to easily and uniquely identify an image.
+[Immutable tags](https://aws.amazon.com/about-aws/whats-new/2019/07/amazon-ecr-now-supports-immutable-image-tags/) force you to update the image tag on each push to the image repository. This can thwart an attacker from overwriting an image with a malicious version without changing the image's tags. Additionally, it gives you a way to easily and uniquely identify an image.  
 
 ### Sign your images
 When Docker was first introduced, there was no cryptographic model for verifying container images.  With v2, Docker added digests to the image manifest. This allowed an image’s configuration to be hashed and for the hash to be used to generate an ID for the image.  When image signing is enabled, the \[Docker\] engine verifies the manifest’s signature, ensuring that the content was produced from a trusted source and no tampering has occurred. After each layer is downloaded, the engine verifies the digest of the layer, ensuring that the content matches the content specified in the manifest.  Image signing  effectively allows you to create a secure supply chain, through the verification of digital signatures associated with the image. 
@@ -159,7 +159,7 @@ In a Kubernetes environment, you can use a dynamic admission controller to verif
 ### Update the packages in your container images
 You should include RUN `apt-get update && apt-get upgrade` in your Dockerfiles to upgrade the packages in your images. Although upgrading requires you to run as root, this occurs during image build phase. The application doesn't need to run as root. You can install the updates and then switch to a different user with the USER directive. If your base image runs as a non-root user, switch to root and back; don't solely rely on the maintainers of the base image to install the latest security updates.
 
-Run `apt-get clean` to delete the installer files from `/var/cache/apt/archives/`. You can also run `rm -rf /var/lib/apt/lists/*` after installing packages. This removes the index files or the lists of packages that are available to install. Be aware that these commands may be different for each package manager. For example:
+Run `apt-get clean` to delete the installer files from `/var/cache/apt/archives/`. You can also run `rm -rf /var/lib/apt/lists/*` after installing packages. This removes the index files or the lists of packages that are available to install. Be aware that these commands may be different for each package manager. For example: 
 
 ```dockerfile
 RUN apt-get update && apt-get install -y \

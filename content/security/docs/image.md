@@ -5,7 +5,6 @@ You should consider the container image as your first line of defense against an
 
 ### Create minimal images
 Start by removing all extraneous binaries from the container image.  If you’re using an unfamiliar image from Dockerhub, inspect the image using an application like [Dive](https://github.com/wagoodman/dive) which can show you the contents of each of the container’s layers.  Remove all binaries with the SETUID and SETGID bits as they can be used to escalate privilege and consider removing all shells and utilities like nc and curl that can be used for nefarious purposes. You can find the files with SETUID and SETGID bits with the following command:
-
 ```bash
 find / -perm /6000 -type f -exec ls -ld {} \;
 ```
@@ -59,13 +58,11 @@ Nowadays, it is not uncommon for an organization to have multiple development te
   ]
 }
 ```
-
 ### Consider using ECR private endpoints
 The ECR API has a public endpoint.  Consequently, ECR registries can be accessed from the Internet so long as the request has been authenticated and authorized by IAM. For those who need to operate in a sandboxed environment where the cluster VPC lacks an Internet Gateway (IGW), you can configure a private endpoint for ECR.  Creating a private endpoint enables you to privately access the ECR API through a private IP address instead of routing traffic across the Internet. For additional information on this topic, see https://docs.aws.amazon.com/AmazonECR/latest/userguide/vpc-endpoints.html.
 
 ### Implement endpoint policies for ECR
 The default endpoint policy for allows access to all ECR repositories within a region.  This might allow an attacker/insider to exfiltrate data by packaging it as a container image and pushing it to a registry in another AWS account.  Mitigating this risk involves creating an endpoint policy that limits API access to ECR repositories. For example, the following policy allows all AWS principles in your account to perform all actions against your and only your ECR repositories:
-
 ```json
 {
   "Statement": [
@@ -96,7 +93,6 @@ Since EKS pulls images for kube-proxy, coredns, and aws-node from ECR, you will 
 For further information about using endpoint policies, see [Using VPC endpoint policies to control Amazon ECR access](https://aws.amazon.com/blogs/containers/using-vpc-endpoint-policies-to-control-amazon-ecr-access/). 
 
 ### Implement lifecycle policies for ECR
-
 The [NIST Application Container Security Guide](https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-190.pdf) warns about the risk of "stale images in registries", noting that over time old images with vulnerable, out-of-date software packages should be removed to prevent accidental deployment and exposure.
 
 Each ECR repository can have a lifecycle policy that sets rules for when images expire. The [AWS official documentation](https://docs.aws.amazon.com/AmazonECR/latest/userguide/LifecyclePolicies.html) describes how to set up test rules, evaluate them and then apply them. There are several [lifecycle policy examples](https://docs.aws.amazon.com/AmazonECR/latest/userguide/lifecycle_policy_examples.html) in the official docs that show different ways of filtering the images in a repository:

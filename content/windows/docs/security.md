@@ -17,7 +17,7 @@ Windows pods in Kubernetes have some limitations and differentiators from standa
 
 Windows uses a Job object per container with a system namespace filter to contain all processes in a container and provide logical isolation from the host. There is no way to run a Windows container without the namespace filtering in place. This means that system privileges cannot be asserted in the context of the host, and thus privileged containers are not available on Windows.
 
-The following `windowsOptions` are the only documented [Windows Security Context options](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.20/#windowssecuritycontextoptions-v1-core) while the rest are general [Security Context options](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#securitycontext-v1-core "https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#securitycontext-v1-core")
+The following `windowsOptions` are the only documented [Windows Security Context options](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.20/#windowssecuritycontextoptions-v1-core) while the rest are general [Security Context options](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#securitycontext-v1-core(https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#securitycontext-v1-core))
 
 For a list of security context attributes that are supported in Windows vs linux, please refer to the official documentation [here](https://kubernetes.io/docs/setup/production-environment/windows/_print/#v1-container).
 
@@ -76,5 +76,5 @@ USER ContainerUser
 
 Also note that, secrets are written in clear text on the node's volume (as compared to tmpfs/in-memory on linux). This means you have to do two things
 
-- Use file ACLs to secure the secrets file location
-- Use volume-level encryption using [BitLocker](https://docs.microsoft.com/en-us/windows/security/information-protection/bitlocker/bitlocker-how-to-deploy-on-windows-server)
++ * Use file ACLs to secure the secrets file location
++ * Use volume-level encryption using [BitLocker](https://docs.microsoft.com/en-us/windows/security/information-protection/bitlocker/bitlocker-how-to-deploy-on-windows-server)
